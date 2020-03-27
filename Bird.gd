@@ -1,4 +1,4 @@
-extends KinematicBody2D
+extends Area2D
 
 var speed = 15.0
 var direction:int
@@ -11,15 +11,17 @@ func _ready():
 	$Vision/CollisionShape2D.shape = CircleShape2D.new()
 	$Vision/CollisionShape2D.shape.radius = vision_distance
 
+func _physics_process(delta):
+	position += Vector2(direction * speed * delta, 0)
+	
 func _process(delta):
 	$Sprite.flip_h = direction < 0
-	move_and_slide(Vector2(speed * direction, 0))
 
 func init(origin):
 	position.x = origin.x
 	position.y = origin.y
-	print(position)
 	direction = 1 if origin.x > 0 else -1
+
 
 func _on_Vision_body_entered(body):
 	if body.name == 'Balloon':

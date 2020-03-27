@@ -57,6 +57,14 @@ func _process(_delta):
 		if score > balloon_y:
 			score = int(balloon_y)
 
+#BIRDS
+		for bird in birds:
+			var bird_x = bird.get_position().x
+			var bird_y = bird.get_position().y
+			
+			if bird.position.y > balloon_y + active_range_y:
+				bird.set_position(Vector2(bird_x, balloon_y - active_range_y))
+
 #CLOUDS
 		for cloud in clouds:
 			var cloud_x = cloud.get_position().x
@@ -74,9 +82,10 @@ func _process(_delta):
 				cloud.set_position(Vector2(cloud_x, cloud_y - active_range_y * 2))		
 			elif cloud_y < balloon_y - active_range_y:
 				cloud.set_position(Vector2(cloud_x, cloud_y + active_range_y * 2 ))
-				
+		
+		
 #GROUND
-		$Ground/GroundRect.set_position(Vector2(balloon_x - 600, 0))
+		$GroundRect.set_position(Vector2(balloon_x - 600, 0))
 		#$DEBUG.text = String(active_area)
 
 func create_cloud(position = Vector2(0, -100), _depth = 1):
@@ -94,6 +103,7 @@ func create_bird():
 			rand_range(balloon_x - active_range_x, balloon_x + active_range_x),
 			rand_range(balloon_y - active_range_y, balloon_y - active_range_y * 1.5)
 			))
+
 	birds.append(new_bird)
 	add_child(new_bird)
 

@@ -1,4 +1,4 @@
-extends KinematicBody2D
+extends Area2D
 
 var press = false
 var steer = 0
@@ -41,16 +41,6 @@ func _ready():
 	randomize()
 	if model_name.left(6) == "iPhone":
 		 dpi_divisor = 3
-		
-#	print(approach(1,2)) #should be 2
-#	print(approach(1,3)) #should be 3
-#	print(approach(10,22,10)) #should be 20
-#	print(approach(20,22,10)) #should be 22
-#	print(approach(-1,-5,1)) #-2
-#	print(approach(-1,-5,1))
-#	print(approach(1,3,1)) #2
-#	print(approach_zero(10,1)) # 9
-#	print(approach(0, -6, 1))
 
 func _input(event):
 	if event is InputEventScreenDrag or (event is InputEventScreenTouch and event.pressed):
@@ -90,12 +80,16 @@ func _process(delta):
 		
 	#write an approach and an approach_zero method in a tool file
 
-	# self.position -= Vector2(x_velocity, y_velocity)
+	self.position -= Vector2(x_velocity, y_velocity)
 	self.position.y = self.position.y if self.position.y < GROUND else GROUND
-	var collision = move_and_collide(-Vector2(x_velocity, y_velocity))
-	
-	if collision and collision.collider.name == "Bird":
-		alive = false
-		print("dead")
+#	var collision = move_and_collide(-Vector2(x_velocity, y_velocity))
+#
+#	if collision and collision.collider.name == "Bird":
+#		alive = false
+#		print("dead")
 
 	#$_DEBUG.text = String(x_velocity)
+
+
+func _on_Balloon_area_entered(area):
+	alive = false

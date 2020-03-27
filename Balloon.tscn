@@ -6,7 +6,8 @@
 [sub_resource type="CircleShape2D" id=1]
 radius = 40.0
 
-[node name="Balloon" type="KinematicBody2D"]
+[node name="Balloon" type="Area2D"]
+collision_mask = 2
 script = ExtResource( 2 )
 
 [node name="Sprite" type="Sprite" parent="."]
@@ -27,3 +28,4 @@ text = "_"
 __meta__ = {
 "_edit_use_anchors_": false
 }
+[connection signal="area_entered" from="." to="." method="_on_Balloon_area_entered"]

@@ -1,11 +1,7 @@
-[gd_scene load_steps=5 format=2]
+[gd_scene load_steps=3 format=2]
 
 [ext_resource path="res://Balloon.tscn" type="PackedScene" id=1]
 [ext_resource path="res://World.gd" type="Script" id=4]
-
-[sub_resource type="RectangleShape2D" id=1]
-
-[sub_resource type="RectangleShape2D" id=2]
 
 [node name="World" type="Node2D"]
 script = ExtResource( 4 )
@@ -39,12 +35,7 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="Ground" type="StaticBody2D" parent="."]
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Ground"]
-shape = SubResource( 1 )
-
-[node name="GroundRect" type="ColorRect" parent="Ground"]
+[node name="GroundRect" type="ColorRect" parent="."]
 margin_left = -600.0
 margin_right = 600.0
 margin_bottom = 80.0
@@ -60,11 +51,6 @@ margin_bottom = 14.0
 __meta__ = {
 "_edit_use_anchors_": false
 }
-
-[node name="ActiveArea" type="Area2D" parent="."]
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="ActiveArea"]
-shape = SubResource( 2 )
 
 [node name="HUD" type="CanvasLayer" parent="."]
 
