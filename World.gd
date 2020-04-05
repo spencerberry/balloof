@@ -3,7 +3,7 @@ extends Node2D
 var game_over = false
 var score = 0
 
-onready var active_area = $Balloon/Camera2D/ActiveArea/Shape.shape
+onready var active_area = $Balloon/Camera2D/ActiveArea/
 
 var Bird = preload("res://Bird.tscn")
 export(int) var bird_count = 12
@@ -21,7 +21,8 @@ func _ready():
 	rng.randomize()
 	#create_cloud()
 	
-#	for _i in range(cloud_count):
+	for _i in range(cloud_count):
+		create_cloud_within(active_area.get_top_half())
 #		var x = rng.randf_range(active_area.position.x - active_area.extents.x, active_area.position.x + active_area.extents.x)
 #		var y = rng.randf_range(active_area.position.y - 1200, active_area.position.y - active_area.size.y)
 #		var starting_position = Vector2(x, y)
@@ -82,6 +83,15 @@ func create_cloud(position = Vector2(0, -500), _depth = 1):
 	var new_cloud = Cloud.instance()
 
 	#new_cloud.init(position)
+	clouds.append(new_cloud)
+	$ParallaxBackground/Mid.add_child(new_cloud)
+
+func create_cloud_within(rectangle: Rect2):
+	var new_cloud = Cloud.instance()
+	var new_position = Vector2(
+			rng.randi_range(rectangle.position.x, rectangle.position.x + rectangle.size.x),
+			rng.randi_range(rectangle.position.y, rectangle.position.y + rectangle.size.y))
+	new_cloud.set_position(new_position)
 	clouds.append(new_cloud)
 	$ParallaxBackground/Mid.add_child(new_cloud)
 
