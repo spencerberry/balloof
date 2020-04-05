@@ -1,5 +1,7 @@
 extends Area2D
 
+class_name Balloon, "res://balloon.png"
+
 var press = false
 var steer = 0
 var alive = true
@@ -20,23 +22,6 @@ const MAX_VELOCITY = 14
 const MAX_STEER = 6
 const GROUND = -40
 
-# Declare member variables here. Examples:
-# var a = 2
-# var b = "text"
-func approach(start, end, step = 1):
-	#if step <= 0: return ("approach step shouldnt be zero or negative")
-	step = abs(step)
-	if start < end:
-		return start + step if start + step < end else end
-	elif start > end:
-		return start - step if start - step > end else end
-	else:
-		return start
-		
-func approach_zero(start, step = 1):
-	return approach(start, 0, step)
-
-# Called when the node enters the scene tree for the first time.
 func _ready():
 	randomize()
 	if model_name.left(6) == "iPhone":
@@ -55,8 +40,7 @@ func _input(event):
 		else:
 
 			steer = 0
-#	elif event is InputEventScreenTouch and event.pressed:
-#		press = true
+
 	elif (event is InputEventScreenTouch and not event.pressed):
 		press = false
 
@@ -82,14 +66,22 @@ func _process(delta):
 
 	self.position -= Vector2(x_velocity, y_velocity)
 	self.position.y = self.position.y if self.position.y < GROUND else GROUND
-#	var collision = move_and_collide(-Vector2(x_velocity, y_velocity))
-#
-#	if collision and collision.collider.name == "Bird":
-#		alive = false
-#		print("dead")
-
-	#$_DEBUG.text = String(x_velocity)
-
 
 func _on_Balloon_area_entered(area):
 	alive = false
+
+
+#UTILITY
+
+func approach(start, end, step = 1):
+	#if step <= 0: return ("approach step shouldnt be zero or negative")
+	step = abs(step)
+	if start < end:
+		return start + step if start + step < end else end
+	elif start > end:
+		return start - step if start - step > end else end
+	else:
+		return start
+		
+func approach_zero(start, step = 1):
+	return approach(start, 0, step)
