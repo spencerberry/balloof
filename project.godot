@@ -25,6 +25,10 @@ run/main_scene="res://World.tscn"
 boot_splash/use_filter=false
 config/icon="res://icon.png"
 
+[autoload]
+
+Global="*res://Global.gd"
+
 [debug]
 
 shapes/collision/shape_color=Color( 0.921569, 0.619608, 0.454902, 0.501961 )

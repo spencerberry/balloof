@@ -47,7 +47,7 @@ func _input(event):
 func _process(delta):
 	y_velocity -= GRAVITY * delta
 	
-	var steer_decay = delta if self.position.y != GROUND else delta * 10
+	var steer_decay = delta if self.position.y != GROUND else delta * 10 #ground friction
 	
 	if press:
 		y_velocity = min(y_velocity + POWER * delta, MAX_VELOCITY)
@@ -59,7 +59,7 @@ func _process(delta):
 
 	else:
 		y_velocity = max(y_velocity, MAX_FALL)
-		var x_magnitude = abs(x_velocity)
+
 		x_velocity = approach_zero(x_velocity, steer_decay)
 		
 	#write an approach and an approach_zero method in a tool file

@@ -10,26 +10,21 @@ export(int) var bird_count = 12
 var birds = []
 
 var Cloud = preload("res://Cloud.tscn")
-var cloud_count = 40
+var cloud_count = 80
 var clouds = []
 
-var rng = RandomNumberGenerator.new()
+
 
 func _ready():
 	#screen_metrics()
 	#$HUD/Label.text  = String(window_size)
-	rng.randomize()
+	Global.rng.randomize()
 	#create_cloud()
 	
 	for _i in range(cloud_count):
 		create_cloud_within(active_area.get_top_half())
-#		var x = rng.randf_range(active_area.position.x - active_area.extents.x, active_area.position.x + active_area.extents.x)
-#		var y = rng.randf_range(active_area.position.y - 1200, active_area.position.y - active_area.size.y)
-#		var starting_position = Vector2(x, y)
-
-#		create_cloud(starting_position)
-
-	create_bird()
+	for _i in range(bird_count):
+		create_bird()
 
 func _process(_delta):
 	
@@ -89,8 +84,8 @@ func create_cloud(position = Vector2(0, -500), _depth = 1):
 func create_cloud_within(rectangle: Rect2):
 	var new_cloud = Cloud.instance()
 	var new_position = Vector2(
-			rng.randi_range(rectangle.position.x, rectangle.position.x + rectangle.size.x),
-			rng.randi_range(rectangle.position.y, rectangle.position.y + rectangle.size.y))
+			Global.rng.randi_range(rectangle.position.x, rectangle.position.x + rectangle.size.x),
+			Global.rng.randi_range(rectangle.position.y, rectangle.position.y + rectangle.size.y))
 	new_cloud.set_position(new_position)
 	clouds.append(new_cloud)
 	$ParallaxBackground/Mid.add_child(new_cloud)
