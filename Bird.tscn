@@ -38,7 +38,6 @@ rect = Rect2( -24, -24, 48, 48 )
 wait_time = 3.0
 one_shot = true
 [connection signal="area_entered" from="Vision" to="." method="_on_found"]
-[connection signal="area_exited" from="Vision" to="." method="_on_lost"]
 [connection signal="screen_entered" from="VisibilityNotifier2D" to="." method="_on_screen_entered"]
 [connection signal="screen_exited" from="VisibilityNotifier2D" to="." method="_on_screen_exited"]
 [connection signal="timeout" from="TimeToTurn" to="." method="_on_time_to_turn"]

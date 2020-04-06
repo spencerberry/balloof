@@ -16,7 +16,7 @@ func _ready() -> void:
 func _physics_process(delta) -> void:
 	position += Vector2(direction * speed * delta, 0)
 
-func _process(delta):
+func _process(_delta):
 	$Sprite.flip_h = direction < 0
 
 func init(origin):
@@ -32,12 +32,6 @@ func _on_found(balloon): # assumes signal only detects balloons
 		target = balloon
 	else:
 		print("Bird saw something not named Balloon")
-
-func _on_lost(balloon): # assumes signal only detects balloons
-	pass
-#	if balloon == target and direction_to_target() != direction:
-#		$TimeToTurn.start()
-#	target = null
 
 func _on_screen_exited(): 
 	if target and target.position.y > position.y: #offscreen but above balloon

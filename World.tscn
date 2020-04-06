@@ -10,6 +10,8 @@ bird_count = 24
 
 [node name="ParallaxBackground" type="ParallaxBackground" parent="."]
 layer = 0
+scale = Vector2( 1, 1.41421 )
+transform = Transform2D( 1, 0, 1, 1, 0, 0 )
 
 [node name="Mid" type="ParallaxLayer" parent="ParallaxBackground"]
 
@@ -33,7 +35,8 @@ editor_draw_drag_margin = true
 margin_top = -700.0
 margin_right = 89.0
 margin_bottom = -669.0
-text = "yo is this cool
+text = "
+
 "
 __meta__ = {
 "_edit_use_anchors_": false
@@ -65,7 +68,7 @@ margin_left = 52.5071
 margin_top = -31.5042
 margin_right = 352.507
 margin_bottom = 368.496
-text = "hey
+text = "
 "
 align = 1
 valign = 1

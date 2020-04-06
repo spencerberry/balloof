@@ -64,10 +64,10 @@ func _process(delta):
 		
 	#write an approach and an approach_zero method in a tool file
 
-	self.position -= Vector2(x_velocity, y_velocity)
-	self.position.y = self.position.y if self.position.y < GROUND else GROUND
+	position -= Vector2(x_velocity, y_velocity)
+	position.y = min(GROUND, position.y)
 
-func _on_Balloon_area_entered(area):
+func _on_Balloon_area_entered(_area):
 	alive = false
 
 
