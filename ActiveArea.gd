@@ -8,6 +8,8 @@ func _ready():
 	print("window is: " + String(OS.get_window_size()))
 	#$Shape.shape.extents = Vector2(10 , 20)
 	$Shape.shape.extents = Vector2(half_size.x , half_size.y)
+	$ColorRect.rect_position = get_right_bumper().position
+	$ColorRect.rect_size = get_right_bumper().size
 func _process(_delta):
 	#global_position = get_global_transform().origin
 	pass
@@ -61,8 +63,8 @@ func get_left_bumper() -> Rect2:
 
 func get_right_bumper() -> Rect2:
 	var top_left_position = Vector2(
-			global_position.x + half_size.x / 2,
-			global_position.y - half_size.y)
+			global_position.x + half_size.x/ 2,
+			global_position.y - half_size.y )
 	var bumper_size = Vector2(
 			half_size.x / 2,
 			half_size.y * 2 )

@@ -3,7 +3,7 @@ extends Node2D
 var game_over = false
 var score = 0
 
-onready var active_area = $Balloon/Camera2D/ActiveArea/
+onready var active_area = $Balloon/ActiveArea/
 #onready var active_area = $HUD/ActiveArea/
 
 var Bird = preload("res://Bird.tscn")
@@ -15,7 +15,7 @@ var cloud_count = 80
 var clouds = []
 
 func _ready():
-	#screen_metrics()
+	screen_metrics()
 	#$HUD/Label.text  = String(window_size)
 	Global.rng.randomize()
 	#create_cloud()
@@ -26,6 +26,7 @@ func _ready():
 		create_bird()
 
 func _process(_delta):
+	$Balloon/Camera2D/DEBUG.text = String($Balloon/Camera2D.offset)
 	
 	if Input.is_action_just_pressed("ui_accept"):
 		$Balloon/Camera2D.zoom = Vector2(1,1) if $Balloon/Camera2D.zoom.x !=1.0 else Vector2(3,3)
@@ -47,7 +48,7 @@ func _process(_delta):
 
 #GROUND
 		$GroundRect.set_position(Vector2(balloon_x - 600, 0))
-		#$DEBUG.text = String(active_area)
+
 
 func create_cloud_within(rectangle: Rect2):
 	var new_cloud = Cloud.instance()

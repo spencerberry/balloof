@@ -12,7 +12,7 @@ var y_velocity = 0
 var screen_center_x = OS.get_window_size().x / 2
 var screen_third_x = OS.get_window_size().x / 3
 var model_name = OS.get_model_name()
-var dpi_divisor = 1
+onready var dpi_divisor = OS.get_window_size() / get_viewport_rect().size
 var tst = "default"
 
 const POWER = 11
@@ -23,20 +23,21 @@ const MAX_STEER = 6
 const GROUND = -40
 
 func _ready():
+	print(get_viewport_rect())
 	randomize()
-	if model_name.left(6) == "iPhone":
-		 dpi_divisor = 3
+#	if model_name.left(6) == "iPhone":
+#		 dpi_divisor = 3
 
 func _input(event):
 	if event is InputEventScreenDrag or (event is InputEventScreenTouch and event.pressed):
 		press = true
 		#steer = screen_center_x / dpi_divisor - event.position.x # 3 comes from DPI on iPhone Pro - half n half steering
-		if event.position.x < screen_third_x / dpi_divisor:
-			steer = event.position.x - (screen_third_x / dpi_divisor)
+		if event.position.x < screen_third_x / dpi_divisor.x:
+			steer = event.position.x - (screen_third_x / dpi_divisor.x)
 
-		elif event.position.x > screen_third_x / dpi_divisor * 2:
+		elif event.position.x > screen_third_x / dpi_divisor.x * 2:
 
-			steer = event.position.x - (screen_third_x / dpi_divisor * 2)
+			steer = event.position.x - (screen_third_x / dpi_divisor.x * 2)
 		else:
 
 			steer = 0
