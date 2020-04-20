@@ -16,7 +16,7 @@ func _process(_delta):
 func _on_cloud_exited(area):
 
 #	$Sprite.modulate(Color(1.0,0.0,0.0))
-	var difference =  area.global_position - global_position
+	var difference = area.global_position - global_position
 	var direction = Global.get_direction(difference)
 	#print(direction)
 	

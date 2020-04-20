@@ -30,16 +30,14 @@ show_behind_parent = true
 current = true
 limit_bottom = 80
 limit_smoothed = true
-smoothing_enabled = true
-smoothing_speed = 6.0
-offset_h = 0.18
-drag_margin_left = 0.15
+smoothing_speed = 8.0
 drag_margin_top = 0.3
-drag_margin_right = 0.15
-drag_margin_bottom = 0.8
+drag_margin_right = 0.8
+drag_margin_bottom = 0.3
 editor_draw_drag_margin = true
 
 [node name="DEBUG" type="Label" parent="Balloon/Camera2D"]
+visible = false
 margin_left = -120.0
 margin_top = -100.0
 margin_right = 80.0

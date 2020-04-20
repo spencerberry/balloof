@@ -29,7 +29,7 @@ func _process(_delta):
 	$Balloon/Camera2D/DEBUG.text = String($Balloon/Camera2D.offset)
 	
 	if Input.is_action_just_pressed("ui_accept"):
-		$Balloon/Camera2D.zoom = Vector2(1,1) if $Balloon/Camera2D.zoom.x !=1.0 else Vector2(3,3)
+		$Balloon/Camera2D.zoom = Vector2(1,1) if $Balloon/Camera2D.zoom.x !=1.0 else Vector2(4,4)
 
 #TO PLAY DEATH ANIMATION?
 	if not $Balloon.alive:

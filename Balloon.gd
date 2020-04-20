@@ -4,15 +4,18 @@ class_name Balloon, "res://balloon.png"
 
 var press = false
 var steer = 0
+var steer_tracker = 0 # track how much we've steered
+var steer_flip = 10 # how much steer before we flip to the next frame
 var alive = true
 
 var x_velocity = 0
-
 var y_velocity = 0
+
 var screen_center_x = OS.get_window_size().x / 2
 var screen_third_x = OS.get_window_size().x / 3
 var model_name = OS.get_model_name()
 onready var dpi_divisor = OS.get_window_size() / get_viewport_rect().size
+onready var sprite = $Sprite
 var tst = "default"
 
 const POWER = 11
@@ -34,17 +37,19 @@ func _input(event):
 		#steer = screen_center_x / dpi_divisor - event.position.x # 3 comes from DPI on iPhone Pro - half n half steering
 		if event.position.x < screen_third_x / dpi_divisor.x:
 			steer = event.position.x - (screen_third_x / dpi_divisor.x)
-
+	
 		elif event.position.x > screen_third_x / dpi_divisor.x * 2:
 
 			steer = event.position.x - (screen_third_x / dpi_divisor.x * 2)
 		else:
-
 			steer = 0
+
 
 	elif (event is InputEventScreenTouch and not event.pressed):
 		press = false
 
+
+	
 func _process(delta):
 	y_velocity -= GRAVITY * delta
 	
@@ -64,9 +69,19 @@ func _process(delta):
 		x_velocity = approach_zero(x_velocity, steer_decay)
 		
 	#write an approach and an approach_zero method in a tool file
+	steer_tracker += x_velocity
+	var last_frame = sprite.hframes - 1
+	while steer_tracker > steer_flip:
+		steer_tracker -= steer_flip
+		sprite.frame =  sprite.frame + 1 if sprite.frame < last_frame else 0
+	while steer_tracker < -steer_flip:
+		steer_tracker += steer_flip
+		sprite.frame = sprite.frame - 1 if sprite.frame > 0 else last_frame
 
+	$_DEBUG.text = String(sprite.hframes)
 	position -= Vector2(x_velocity, y_velocity)
 	position.y = min(GROUND, position.y)
+	
 
 func _on_Balloon_area_entered(_area):
 	alive = false
