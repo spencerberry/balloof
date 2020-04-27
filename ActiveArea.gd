@@ -12,13 +12,14 @@ func _ready():
 
 	#$Shape.shape.extents = Vector2(10 , 20)
 	$Shape.shape.extents = Vector2(width / 2, height / 2) #active area is 3 x 3 of view
-	
 
 func _process(_delta):
-	var current_camera = get_parent().get_node("Camera2D")
-	var camera_rect = get_camera_rect(current_camera)
-	$ColorRect.rect_global_position = Vector2(camera_rect.x, camera_rect.y)
-	$ColorRect.rect_size = Vector2(camera_rect.w, camera_rect.h)
+	var current_camera = get_parent()
+	#set_global_position(current_camera.get_camera_screen_center())
+	
+	var red_rect = get_top_bumper()
+	$ColorRect.rect_global_position = red_rect.position
+	$ColorRect.rect_size = red_rect.size
 #	$ColorRect.rect_global_position = get_right_bumper().position
 #	$ColorRect.rect_size = get_right_bumper().size
 #	global_position = get_global_transform().origin
@@ -61,7 +62,6 @@ func get_bottom_bumper() -> Rect2:
 			view_size.y / 2 )
 	return Rect2(top_left_position, bumper_size)
 
-
 func get_left_bumper() -> Rect2:
 	var top_left_position = Vector2(
 			global_position.x - view_size.x,
@@ -83,9 +83,9 @@ func get_right_bumper() -> Rect2:
 func get_camera_rect(camera):
 	var rect = {"x": 0, "y": 0, "w": 0, "h": 0}
 	var cameraPos = camera.get_camera_screen_center()
-	var viewportRect = get_viewport_rect().size / 2 * camera.zoom
+	var viewportRect = get_viewport_rect().size / 2 
 	rect.x = cameraPos.x - viewportRect.x
 	rect.y = cameraPos.y - viewportRect.y
-	rect.w = cameraPos.x + viewportRect.x
-	rect.h = cameraPos.y + viewportRect.y
+	rect.w = viewportRect.x * 2
+	rect.h = viewportRect.y * 2
 	return rect

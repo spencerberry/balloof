@@ -13,7 +13,7 @@ font_data = ExtResource( 3 )
 
 [node name="World" type="Node2D"]
 script = ExtResource( 4 )
-bird_count = 24
+bird_count = 8
 
 [node name="ParallaxBackground" type="ParallaxBackground" parent="."]
 layer = 0
@@ -30,6 +30,7 @@ show_behind_parent = true
 current = true
 limit_bottom = 80
 limit_smoothed = true
+smoothing_enabled = true
 smoothing_speed = 8.0
 drag_margin_top = 0.3
 drag_margin_right = 0.8
@@ -49,14 +50,10 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="ActiveArea" parent="Balloon" instance=ExtResource( 2 )]
+[node name="ActiveArea" parent="Balloon/Camera2D" instance=ExtResource( 2 )]
 
-[node name="_Debug" type="Label" parent="."]
-margin_right = 40.0
-margin_bottom = 14.0
-__meta__ = {
-"_edit_use_anchors_": false
-}
+[node name="RemoteTransform2D" type="RemoteTransform2D" parent="Balloon/Camera2D/ActiveArea"]
+remote_path = NodePath("../..")
 
 [node name="GroundRect" type="ColorRect" parent="."]
 margin_left = -600.0
