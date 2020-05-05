@@ -5,6 +5,7 @@ var game_over_reset_time = 0
 var score = 0
 
 onready var active_area = $Balloon/Camera2D/ActiveArea/
+onready var balloon = $Balloon
 #onready var active_area = $HUD/ActiveArea/
 
 var Bird = preload("res://Bird.tscn")
@@ -24,7 +25,7 @@ func _ready():
 	for _i in range(cloud_count):
 		create_cloud_within(active_area.get_all())
 	for _i in range(bird_count):
-		pass#create_bird()
+		create_bird(active_area.get_top_full())
 
 func _process(delta):
 
@@ -39,14 +40,18 @@ func _process(delta):
 		game_over = true
 		
 	if game_over:
-		print('game over: ' + String(game_over_reset_time))
+
 		$HUD/Label.text = " Game Over \n you flew " + String(score) + " high"
+
 		
 		if game_over_reset_time > 1:
 			get_tree().reload_current_scene()
 		elif $Balloon.press:
 			game_over_reset_time += delta
-		
+		else:
+			game_over_reset_time = max(0, game_over_reset_time - delta)
+		$HUD/FadeOut.set_frame_color(Color(1,1,1, game_over_reset_time))
+
 
 	else:
 #GAME LOOP
@@ -68,12 +73,13 @@ func create_cloud_within(rectangle: Rect2):
 	clouds.append(new_cloud)
 	add_child(new_cloud)
 
-func create_bird():
+func create_bird(within_area = active_area.get_top_bumper()):
 	var new_bird = Bird.instance()
-	birds.append(new_bird)
 	add_child(new_bird)
-	new_bird.move_within(active_area.get_top_bumper())
-	
+	new_bird.target = balloon
+	new_bird.move_within(within_area)
+	birds.append(new_bird)
+		
 func screen_metrics():
 	print("                 [Screen Metrics]")
 	print("            Display size: ", OS.get_screen_size())

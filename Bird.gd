@@ -1,7 +1,7 @@
 extends Area2D
 
-var speed = randi() % 200 + 100
-var direction:int = -1
+var speed = randi() % 120 + 100
+var direction:int
 var window_size = OS.get_window_size()
 var offscreen = false
 
@@ -11,15 +11,16 @@ onready var shape = $ShapeToKill.shape
 
 func _ready() -> void:
 	pass
-	
+
 func _physics_process(delta) -> void:
 	position += Vector2(direction * speed * delta, 0)
 
 func _process(_delta):
-	
-	if target and direction_to_target() != direction and $TimeToTurn.time_left == 0:
-		print($TimeToTurn.time_left)
-		$TimeToTurn.start()
+	if target:
+		if direction != direction_to_target() and $TimeToTurn.time_left == 0:
+			$TimeToTurn.start()
+#	if target and direction_to_target() != direction:
+#		$TimeToTurn.start()
 
 	$Sprite.flip_h = direction < 0
 
@@ -29,13 +30,9 @@ func _process(_delta):
 #	direction = 1 if origin.x > 0 else -1
 
 func direction_to_target():
-	return sign(target.position.x - position.x)
-
-func _on_found(balloon): # assumes signal only detects balloons
-	if balloon.name == 'Balloon':
-		target = balloon
-	else:
-		print("Bird saw something not named Balloon")
+	var new_direction = target.global_position.x - global_position.x
+	if new_direction == 0: new_direction = 1
+	return sign(new_direction)
 
 func _on_screen_exited(): 
 #	if target and target.position.y > position.y: #offscreen but above balloon
@@ -46,9 +43,12 @@ func _on_screen_exited():
 func _on_screen_entered():
 	#offscreen = false
 	pass
+
 	
 func _on_time_to_turn():
 	direction = direction_to_target()
+	position.y += 10
+
 
 
 func move_within(rectangle: Rect2):
@@ -56,10 +56,15 @@ func move_within(rectangle: Rect2):
 			Global.rng.randi_range(rectangle.position.x, rectangle.position.x + rectangle.size.x - shape.extents.x * 2),
 			Global.rng.randi_range(rectangle.position.y, rectangle.position.y + rectangle.size.y - shape.extents.y * 2))
 	set_position(new_position)
+	direction = direction_to_target()
+
 
 
 func _on_area_exited(area):
 	move_within(area.get_top_bumper())
+	direction = 1
+
+	if target: print(String(global_position.x) + " minus " + String(target.global_position.x))
 	#make sure that bird is only monitoring active_area and we should be good here
 	#if position.y > area.position.y + area.size.y:
 		#https://a8c.slack.com/archives/C03TY6J1A/p1587679050045000print("bird left bottom")

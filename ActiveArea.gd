@@ -17,7 +17,7 @@ func _process(_delta):
 	var current_camera = get_parent()
 	#set_global_position(current_camera.get_camera_screen_center())
 	
-	var red_rect = get_top_bumper()
+	var red_rect = get_top_full()
 	$ColorRect.rect_global_position = red_rect.position
 	$ColorRect.rect_size = red_rect.size
 #	$ColorRect.rect_global_position = get_right_bumper().position
@@ -42,6 +42,15 @@ func get_top_half() -> Rect2:
 	var top_view_size = Vector2(
 			view_size.x * 2,
 			view_size.y )
+	return Rect2(top_left_position, top_view_size)
+
+func get_top_full() -> Rect2:
+	var top_left_position = Vector2(
+			global_position.x - view_size.x * 1.5,
+			global_position.y - view_size.y - height )
+	var top_view_size = Vector2(
+			view_size.x * 3,
+			view_size.y * 3)
 	return Rect2(top_left_position, top_view_size)
 	
 func get_top_bumper() -> Rect2:

@@ -24,8 +24,8 @@ onready var screen_width = OS.get_window_size().x / dpi_divisor.x
 onready var sprite = $Sprite
 var tst = "default"
 
-const POWER = 4
-const GRAVITY = 2
+const POWER = 9
+const GRAVITY = 5
 const MAX_FALL = -4
 const MAX_VELOCITY = 6
 const MAX_STEER = 6
@@ -54,7 +54,6 @@ func _input(event):
 			#var distance_to_steer = event.position.x - (screen_third_x / dpi_divisor.x * 2)
 			var distance_to_steer = (event.position.x - screen_two_thirds) / (screen_width - screen_two_thirds)
 			steer = distance_to_steer
-
 		else:
 			steer = 0
 		
@@ -66,6 +65,10 @@ func _input(event):
 
 	
 func _process(delta):
+	var simple_accel = (Input.get_accelerometer() * 10).round()/10
+	var simple_gyro = (Input.get_gyroscope()).round()
+	$_DEBUG.text = String(simple_accel)
+	$_DEBUG2.text = String(simple_gyro)
 	if alive:
 		y_velocity -= GRAVITY * delta
 		
@@ -94,7 +97,7 @@ func _process(delta):
 			steer_tracker += steer_flip
 			sprite.frame = sprite.frame - 1 if sprite.frame > 0 else last_frame
 	
-		$_DEBUG.text = String(x_velocity)
+		
 		
 		position -= Vector2(x_velocity, y_velocity)
 		position.y = min(GROUND, position.y)
