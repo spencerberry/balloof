@@ -17,7 +17,7 @@ var cloud_count = 80
 var clouds = []
 
 func _ready():
-	screen_metrics()
+	#screen_metrics()
 	#$HUD/Label.text  = String(window_size)
 	Global.rng.randomize()
 	#create_cloud()
@@ -40,12 +40,12 @@ func _process(delta):
 		game_over = true
 		
 	if game_over:
-
 		$HUD/Label.text = " Game Over \n you flew " + String(score) + " high"
 
 		
 		if game_over_reset_time > 1:
-			get_tree().reload_current_scene()
+			var _reloaded = get_tree().reload_current_scene()
+
 		elif $Balloon.press:
 			game_over_reset_time += delta
 		else:

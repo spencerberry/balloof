@@ -4,11 +4,19 @@ class_name Balloon, "res://balloon.png"
 
 var press = false
 var steer = 0
+var press_duration = 0
+
+const BOOST_DURATION = 10 #frames to get a boost
+const BOOST_POWER = 20
+const BOOST_MAX = 16
 
 var steer_tracker = 0 # track how much we've steered for animation purposes
 var steer_flip = 18 # we flip to the next frame when tracker reaches this
 
-var alive = true # for now
+var alive = true # foMr now
+
+var direction:float = 0
+var velocity:float = 0
 
 var x_velocity = 0
 var y_velocity = 0
@@ -22,18 +30,22 @@ onready var screen_third_x = OS.get_window_size().x / dpi_divisor.x / 3
 onready var screen_width = OS.get_window_size().x / dpi_divisor.x
 
 onready var sprite = $Sprite
+onready var powerMeter = $Sprite/RectOfPower
+
 var tst = "default"
 
 const POWER = 9
-const GRAVITY = 5
+const GRAVITY = 4
 const MAX_FALL = -4
-const MAX_VELOCITY = 6
+const MAX_VELOCITY = 7
 const MAX_STEER = 6
 const GROUND = -40
 
 func _ready():
-	print(get_viewport_rect())
+	#print(get_viewport_rect())
 	randomize()
+
+
 #	if model_name.left(6) == "iPhone":
 #		 dpi_divisor = 3
 
@@ -56,38 +68,45 @@ func _input(event):
 			steer = distance_to_steer
 		else:
 			steer = 0
-		
-
 
 	elif (event is InputEventScreenTouch and not event.pressed):
 		press = false
 
-
-	
 func _process(delta):
-	var simple_accel = (Input.get_accelerometer() * 10).round()/10
-	var simple_gyro = (Input.get_gyroscope()).round()
-	$_DEBUG.text = String(simple_accel)
-	$_DEBUG2.text = String(simple_gyro)
+#	var simple_accel = (Input.get_accelerometer() * 10).round()/10
+#	var simple_gyro = (Input.get_gyroscope()).round()
+#	$_DEBUG.text = String(simple_accel)
+#	$_DEBUG2.text = String(simple_gyro)
 	if alive:
-		y_velocity -= GRAVITY * delta
-		
+
 		var steer_decay = delta if self.position.y != GROUND else delta * 10 #ground friction
-		
+
 		if press:
-			y_velocity = min(y_velocity + POWER * delta, MAX_VELOCITY)
 			
+			velocity = approach(velocity, MAX_VELOCITY, POWER * delta)
+			press_duration += delta * 60
+			
+			if press_duration < BOOST_DURATION:
+
+				y_velocity = min(y_velocity + BOOST_POWER * delta, BOOST_MAX)
+			else:
+				y_velocity = min(y_velocity + POWER * delta, MAX_VELOCITY)
+			  
 			if self.position.y == GROUND:
 				x_velocity = approach_zero(x_velocity, steer_decay)
 			else:
 				x_velocity = approach(x_velocity, steer * MAX_STEER, steer * delta * 10)
 	
 		else:
+			velocity = approach(velocity, MAX_FALL, GRAVITY * delta )
+			#if press_duration !=0: $_DEBUG.text = String(press_duration)
+			press_duration = 0
 			y_velocity = max(y_velocity, MAX_FALL)
 	
 			x_velocity = approach_zero(x_velocity, steer_decay)
 			
 		#write an approach and an approach_zero method in a tool file
+		
 		steer_tracker += x_velocity
 		var last_frame = sprite.hframes - 1
 		while steer_tracker > steer_flip:
@@ -96,17 +115,20 @@ func _process(delta):
 		while steer_tracker < -steer_flip:
 			steer_tracker += steer_flip
 			sprite.frame = sprite.frame - 1 if sprite.frame > 0 else last_frame
-	
-		
-		
+			
+		y_velocity -= GRAVITY * delta
 		position -= Vector2(x_velocity, y_velocity)
 		position.y = min(GROUND, position.y)
-	else:
-		pass
 	
-
+	#
+	powerMeter.rect_size.y = abs(velocity) * 10
+	if velocity > 0: powerMeter.set_frame_color(Color.bisque)
+	else: powerMeter.set_frame_color(Color.darkorchid)
+	
+	$_DEBUG.text = String(velocity)
 func _on_Balloon_area_entered(_area):
 	alive = false
+
 #UTILITY
 
 func approach(start, end, step = 1):

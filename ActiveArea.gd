@@ -7,16 +7,14 @@ onready var height: float = view_size.y * 3
 #onready var global_position = get_global_transform().origin
 
 func _ready():
-	print("view is: " + String(view_size))
-	print("window is: " + String(OS.get_window_size()))
+#	print("view is: " + String(view_size))
+#	print("window is: " + String(OS.get_window_size()))
 
 	#$Shape.shape.extents = Vector2(10 , 20)
 	$Shape.shape.extents = Vector2(width / 2, height / 2) #active area is 3 x 3 of view
 
 func _process(_delta):
-	var current_camera = get_parent()
-	#set_global_position(current_camera.get_camera_screen_center())
-	
+
 	var red_rect = get_top_full()
 	$ColorRect.rect_global_position = red_rect.position
 	$ColorRect.rect_size = red_rect.size

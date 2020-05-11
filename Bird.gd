@@ -64,7 +64,5 @@ func _on_area_exited(area):
 	move_within(area.get_top_bumper())
 	direction = 1
 
-	if target: print(String(global_position.x) + " minus " + String(target.global_position.x))
+	#if target: print(String(global_position.x) + " minus " + String(target.global_position.x))
 	#make sure that bird is only monitoring active_area and we should be good here
-	#if position.y > area.position.y + area.size.y:
-		#https://a8c.slack.com/archives/C03TY6J1A/p1587679050045000print("bird left bottom")
