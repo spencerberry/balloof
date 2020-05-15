@@ -2,44 +2,59 @@ extends Area2D
 
 class_name Balloon, "res://balloon.png"
 
-var press = false
-var steer = 0
-var press_duration = 0
+## screen knowledge for input
+onready var dpi_divisor = OS.get_window_size() / get_viewport_rect().size
+onready var screen_third_x = OS.get_window_size().x / dpi_divisor.x / 3
+onready var screen_width = OS.get_window_size().x / dpi_divisor.x
+onready var screen_center_x = OS.get_window_size().x / 2
 
-const BOOST_DURATION = 10 #frames to get a boost
-const BOOST_POWER = 20
-const BOOST_MAX = 16
+var press = false # is the finger on the screen?
+
+# Draw data
+onready var sprite = $Sprite
+onready var powerMeter = $Sprite/RectOfPower
 
 var steer_tracker = 0 # track how much we've steered for animation purposes
 var steer_flip = 18 # we flip to the next frame when tracker reaches this
 
-var alive = true # foMr now
+# Speed data
 
+const RAMP_DURATION = 30 # How many frames does ramp last
+var ramp_count = RAMP_DURATION # Counter to track these frames
+const RAMP_POWER = .1 # Added to thrust while in ramp
+
+const BOOST_DURATION = 20 # How many frames a boost lasts
+var boost_count = BOOST_DURATION # Counter to track boost frames
+const BOOST_POWER = .44 # Added to thrust while in boost
+
+const CRUISE_MAX = 12 # speed while held down
+
+const DECAY = .2
+
+var thrust: float = 0
+var speed:float = 0
+
+#debug
+var state: String
+# refactor above this line
+
+#not implemented yet
+var steer = 0
+var press_duration = 0
 var direction:float = 0
-var velocity:float = 0
 
-var x_velocity = 0
-var y_velocity = 0
-
-var screen_center_x = OS.get_window_size().x / 2
-
-var model_name = OS.get_model_name()
-
-onready var dpi_divisor = OS.get_window_size() / get_viewport_rect().size
-onready var screen_third_x = OS.get_window_size().x / dpi_divisor.x / 3
-onready var screen_width = OS.get_window_size().x / dpi_divisor.x
-
-onready var sprite = $Sprite
-onready var powerMeter = $Sprite/RectOfPower
-
-var tst = "default"
-
-const POWER = 9
+var alive = true # for now
 const GRAVITY = 4
 const MAX_FALL = -4
-const MAX_VELOCITY = 7
-const MAX_STEER = 6
 const GROUND = -40
+
+
+##To retire? 
+#const BOOST_MAX = 16
+#var x_velocity = 0
+#var y_velocity = 0
+#var model_name = OS.get_model_name()
+#const MAX_STEER = 6
 
 func _ready():
 	#print(get_viewport_rect())
@@ -73,59 +88,96 @@ func _input(event):
 		press = false
 
 func _process(delta):
+
+	var delta_frames = delta * 60
 #	var simple_accel = (Input.get_accelerometer() * 10).round()/10
 #	var simple_gyro = (Input.get_gyroscope()).round()
 #	$_DEBUG.text = String(simple_accel)
 #	$_DEBUG2.text = String(simple_gyro)
 	if alive:
-
-		var steer_decay = delta if self.position.y != GROUND else delta * 10 #ground friction
-
-		if press:
-			
-			velocity = approach(velocity, MAX_VELOCITY, POWER * delta)
-			press_duration += delta * 60
-			
-			if press_duration < BOOST_DURATION:
-
-				y_velocity = min(y_velocity + BOOST_POWER * delta, BOOST_MAX)
-			else:
-				y_velocity = min(y_velocity + POWER * delta, MAX_VELOCITY)
-			  
-			if self.position.y == GROUND:
-				x_velocity = approach_zero(x_velocity, steer_decay)
-			else:
-				x_velocity = approach(x_velocity, steer * MAX_STEER, steer * delta * 10)
-	
+		if press and ramp_count > 0:
+			ramp(delta_frames)
+		elif press and boost_count > 0:
+			boost(delta_frames)
+		elif press:
+			cruise(delta_frames)
 		else:
-			velocity = approach(velocity, MAX_FALL, GRAVITY * delta )
-			#if press_duration !=0: $_DEBUG.text = String(press_duration)
-			press_duration = 0
-			y_velocity = max(y_velocity, MAX_FALL)
-	
-			x_velocity = approach_zero(x_velocity, steer_decay)
-			
-		#write an approach and an approach_zero method in a tool file
+			decay(delta_frames)
+
 		
-		steer_tracker += x_velocity
-		var last_frame = sprite.hframes - 1
-		while steer_tracker > steer_flip:
-			steer_tracker -= steer_flip
-			sprite.frame =  sprite.frame + 1 if sprite.frame < last_frame else 0
-		while steer_tracker < -steer_flip:
-			steer_tracker += steer_flip
-			sprite.frame = sprite.frame - 1 if sprite.frame > 0 else last_frame
-			
-		y_velocity -= GRAVITY * delta
-		position -= Vector2(x_velocity, y_velocity)
-		position.y = min(GROUND, position.y)
+		set_position(get_position() + Vector2(0, - thrust))
 	
+#
+#		var steer_decay = delta if self.position.y != GROUND else delta * 10 #ground friction
+#
+#		if press:
+#
+#			speed = approach(speed, MAX_VELOCITY, POWER * delta)
+#			press_duration += delta * 60
+#
+#			if press_duration < BOOST_DURATION:
+#
+#				y_velocity = min(y_velocity + BOOST_POWER * delta, BOOST_MAX)
+#			else:
+#				y_velocity = min(y_velocity + POWER * delta, MAX_VELOCITY)
+#
+#			if self.position.y == GROUND:
+#				x_velocity = approach_zero(x_velocity, steer_decay)
+#			else:
+#				x_velocity = approach(x_velocity, steer * MAX_STEER, steer * delta * 10)
+#
+#		else:
+#			speed = approach(speed, MAX_FALL, GRAVITY * delta )
+#			#if press_duration !=0: $_DEBUG.text = String(press_duration)
+#			press_duration = 0
+#			y_velocity = max(y_velocity, MAX_FALL)
+#
+#			x_velocity = approach_zero(x_velocity, steer_decay)
+#
+#		#write an approach and an approach_zero method in a tool file
+#
+#		steer_tracker += x_velocity
+#		var last_frame = sprite.hframes - 1
+#		while steer_tracker > steer_flip:
+#			steer_tracker -= steer_flip
+#			sprite.frame =  sprite.frame + 1 if sprite.frame < last_frame else 0
+#		while steer_tracker < -steer_flip:
+#			steer_tracker += steer_flip
+#			sprite.frame = sprite.frame - 1 if sprite.frame > 0 else last_frame
+#
+#		y_velocity -= GRAVITY * delta
+#		position -= Vector2(x_velocity, y_velocity)
+#		position.y = min(GROUND, position.y)
+		pass
 	#
-	powerMeter.rect_size.y = abs(velocity) * 10
-	if velocity > 0: powerMeter.set_frame_color(Color.bisque)
+	powerMeter.rect_size.y = abs(speed) * 10
+	if speed > 0: powerMeter.set_frame_color(Color.bisque)
 	else: powerMeter.set_frame_color(Color.darkorchid)
 	
-	$_DEBUG.text = String(velocity)
+	$_DEBUG.text = state
+	$_DEBUG2.text = String(thrust)
+	
+func ramp(delta_frames):
+	thrust += RAMP_POWER
+	ramp_count -= delta_frames
+	state = "ramp"
+	
+func boost(delta_frames):
+	thrust += BOOST_POWER
+	boost_count -= delta_frames
+	state = "boost"
+	
+func cruise(delta_frames):
+	thrust = approach(thrust, CRUISE_MAX, DECAY)
+	state = "cruise"
+	
+func decay(delta_frames):
+	thrust = approach_zero(thrust, DECAY)
+	state = "decay"
+	boost_count = BOOST_DURATION
+	if thrust == 0:
+		ramp_count = RAMP_DURATION
+	
 func _on_Balloon_area_entered(_area):
 	alive = false
 

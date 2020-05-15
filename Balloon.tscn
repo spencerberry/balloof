@@ -44,14 +44,14 @@ shape = SubResource( 1 )
 margin_left = -123.458
 margin_top = -73.131
 margin_right = 116.542
-margin_bottom = -25.131
+margin_bottom = 22.869
 grow_horizontal = 0
 grow_vertical = 0
 size_flags_vertical = 7
 custom_fonts/font = SubResource( 2 )
 custom_colors/font_color = Color( 0.945098, 0.0705882, 0.0705882, 1 )
 custom_colors/font_color_shadow = Color( 0, 0, 0, 1 )
-text = "(-.9, -.1,-0.2)"
+text = "state"
 valign = 1
 max_lines_visible = 1
 __meta__ = {
@@ -59,7 +59,6 @@ __meta__ = {
 }
 
 [node name="_DEBUG2" type="Label" parent="."]
-visible = false
 margin_left = -153.928
 margin_top = -102.959
 margin_right = 118.072
