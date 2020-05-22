@@ -22,3 +22,15 @@ func get_direction(difference: Vector2):
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 #func _process(delta):
 #	pass
+#
+#func simplify(long_decimal, decimal_count:int = 2):
+#	return round(long_decimal * pow(10, decimal_count)) / pow(10, decimal_count)
+
+func simplify(vec, decimal_count: int = 2):
+	var result
+	var step = 1/pow(10, decimal_count)
+	if typeof(vec) == TYPE_VECTOR2:
+		result = Vector2(stepify(vec.x, step), stepify(vec.y, step))
+	elif typeof(vec) == TYPE_VECTOR3:
+		result = Vector3(stepify(vec.x, step), stepify(vec.y, step), stepify(vec.z, step))
+	return result

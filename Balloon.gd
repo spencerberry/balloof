@@ -12,12 +12,15 @@ var press = false # is the finger on the screen?
 
 # Draw data
 onready var sprite = $Sprite
+onready var fire = $Fire
 onready var powerMeter = $Sprite/RectOfPower
 
 var steer_tracker = 0 # track how much we've steered for animation purposes
 var steer_flip = 18 # we flip to the next frame when tracker reaches this
 
-# Speed data
+var fire_tracker:float = 0.0
+const FIRE_FLIP = 0.5
+# Speed
 
 const RAMP_DURATION = 30 # How many frames does ramp last
 var ramp_count = RAMP_DURATION # Counter to track these frames
@@ -34,18 +37,26 @@ const DECAY = .2
 var thrust: float = 0
 var speed:float = 0
 
+# Direction
+var steer:float  = 0
+const STEER_MAX:float = 8.0
+var direction:Vector2
+
+
+#velocity
+var velocity:Vector2
 #debug
 var state: String
 # refactor above this line
 
 #not implemented yet
-var steer = 0
+
 var press_duration = 0
-var direction:float = 0
+
 
 var alive = true # for now
-const GRAVITY = 4
-const MAX_FALL = -4
+const GRAVITY = 100
+const MAX_FALL = -6
 const GROUND = -40
 
 
@@ -87,14 +98,21 @@ func _input(event):
 	elif (event is InputEventScreenTouch and not event.pressed):
 		press = false
 
+func _physics_process(delta):
+	if alive:
+		global_translate(-velocity)
+	
 func _process(delta):
-
+	var gyro = Input.get_gyroscope()
+	
+	steer = clamp(gyro.z / 6, -STEER_MAX, STEER_MAX)
 	var delta_frames = delta * 60
 #	var simple_accel = (Input.get_accelerometer() * 10).round()/10
 #	var simple_gyro = (Input.get_gyroscope()).round()
 #	$_DEBUG.text = String(simple_accel)
 #	$_DEBUG2.text = String(simple_gyro)
 	if alive:
+		# pressed -> thrust
 		if press and ramp_count > 0:
 			ramp(delta_frames)
 		elif press and boost_count > 0:
@@ -105,8 +123,19 @@ func _process(delta):
 			decay(delta_frames)
 
 		
-		set_position(get_position() + Vector2(0, - thrust))
-	
+		# steer -> direction
+		
+		direction = (Vector2(steer * STEER_MAX, 1)).normalized()
+		
+		# velocity
+		
+		velocity = (direction * thrust)
+		velocity.y -= GRAVITY * delta
+		velocity.y = clamp(velocity.y, MAX_FALL, 1000)
+
+		
+		#set_position(get_position() + Vector2(0, - thrust))
+
 #
 #		var steer_decay = delta if self.position.y != GROUND else delta * 10 #ground friction
 #
@@ -136,46 +165,57 @@ func _process(delta):
 #
 #		#write an approach and an approach_zero method in a tool file
 #
-#		steer_tracker += x_velocity
-#		var last_frame = sprite.hframes - 1
-#		while steer_tracker > steer_flip:
-#			steer_tracker -= steer_flip
-#			sprite.frame =  sprite.frame + 1 if sprite.frame < last_frame else 0
-#		while steer_tracker < -steer_flip:
-#			steer_tracker += steer_flip
-#			sprite.frame = sprite.frame - 1 if sprite.frame > 0 else last_frame
-#
+		steer_tracker += velocity.x
+		var last_frame = sprite.hframes - 1
+		while steer_tracker > steer_flip:
+			steer_tracker -= steer_flip
+			sprite.frame =  sprite.frame + 1 if sprite.frame < last_frame else 0
+		while steer_tracker < -steer_flip:
+			steer_tracker += steer_flip
+			sprite.frame = sprite.frame - 1 if sprite.frame > 0 else last_frame
+		
+		fire_tracker += delta
+		#print(fire_tracker)		
+		if fire_tracker > FIRE_FLIP:
+			fire_tracker = 0
+
+			fire.frame = fire.frame + 1 if fire.frame < 5 else 0
+
 #		y_velocity -= GRAVITY * delta
 #		position -= Vector2(x_velocity, y_velocity)
-#		position.y = min(GROUND, position.y)
-		pass
-	#
+		
+		position.y = min(GROUND, position.y)
 	powerMeter.rect_size.y = abs(speed) * 10
 	if speed > 0: powerMeter.set_frame_color(Color.bisque)
 	else: powerMeter.set_frame_color(Color.darkorchid)
 	
-	$_DEBUG.text = state
-	$_DEBUG2.text = String(thrust)
+	$_DEBUG.text = String(Global.simplify(direction))
+	$_DEBUG2.text = String(stepify(steer, .01))
 	
 func ramp(delta_frames):
 	thrust += RAMP_POWER
 	ramp_count -= delta_frames
 	state = "ramp"
+	fire.scale.y = .3
+
 	
 func boost(delta_frames):
 	thrust += BOOST_POWER
 	boost_count -= delta_frames
 	state = "boost"
+	fire.scale.y = 1
 	
 func cruise(delta_frames):
 	thrust = approach(thrust, CRUISE_MAX, DECAY)
 	state = "cruise"
+	fire.scale.y = 0.6
 	
 func decay(delta_frames):
 	thrust = approach_zero(thrust, DECAY)
 	state = "decay"
 	boost_count = BOOST_DURATION
 	if thrust == 0:
+		fire.scale.y = 0.0
 		ramp_count = RAMP_DURATION
 	
 func _on_Balloon_area_entered(_area):

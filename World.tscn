@@ -18,12 +18,10 @@ font_data = ExtResource( 3 )
 
 [node name="World" type="Node2D"]
 script = ExtResource( 4 )
-bird_count = 0
+bird_count = 8
 
 [node name="ParallaxBackground" type="ParallaxBackground" parent="."]
 layer = 0
-scale = Vector2( 1, 1.41421 )
-transform = Transform2D( 1, 0, 1, 1, 0, 0 )
 
 [node name="Mid" type="ParallaxLayer" parent="ParallaxBackground"]
 
@@ -32,12 +30,15 @@ position = Vector2( 0, -40 )
 
 [node name="Camera2D" type="Camera2D" parent="Balloon"]
 show_behind_parent = true
+offset = Vector2( 0, -203 )
 current = true
-limit_bottom = 80
+limit_bottom = 283
 limit_smoothed = true
+drag_margin_v_enabled = true
 smoothing_enabled = true
 smoothing_speed = 8.0
-drag_margin_top = 0.3
+offset_v = -0.47
+drag_margin_top = 0.1
 drag_margin_right = 0.8
 drag_margin_bottom = 0.3
 editor_draw_drag_margin = true
