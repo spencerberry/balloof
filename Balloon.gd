@@ -10,6 +10,10 @@ onready var screen_center_x = OS.get_window_size().x / 2
 
 var press = false # is the finger on the screen?
 
+var delta_frames:float
+
+
+
 # Draw data
 onready var sprite = $Sprite
 onready var fire = $Fire
@@ -28,20 +32,21 @@ const RAMP_POWER = .1 # Added to thrust while in ramp
 
 const BOOST_DURATION = 20 # How many frames a boost lasts
 var boost_count = BOOST_DURATION # Counter to track boost frames
-const BOOST_POWER = .44 # Added to thrust while in boost
+const BOOST_POWER = 1.2 # Added to thrust while in boost, in change per frame
+const BOOST_MAX = 60 
 
-const CRUISE_MAX = 12 # speed while held down
+const CRUISE_MAX = 14 # max thrust while held down
 
-const DECAY = .2
+const DECAY = .3
 
 var thrust: float = 0
 var speed:float = 0
+const SPEED_MAX = 44
 
 # Direction
 var steer:float  = 0
 const STEER_MAX:float = 8.0
 var direction:Vector2
-
 
 #velocity
 var velocity:Vector2
@@ -51,14 +56,10 @@ var state: String
 
 #not implemented yet
 
-var press_duration = 0
-
-
 var alive = true # for now
-const GRAVITY = 100
+const GRAVITY = .5
 const MAX_FALL = -6
 const GROUND = -40
-
 
 ##To retire? 
 #const BOOST_MAX = 16
@@ -103,10 +104,15 @@ func _physics_process(delta):
 		global_translate(-velocity)
 	
 func _process(delta):
+	delta_frames = delta * 60
 	var gyro = Input.get_gyroscope()
+	var is_gyro = gyro != Vector3.ZERO
 	
-	steer = clamp(gyro.z / 6, -STEER_MAX, STEER_MAX)
-	var delta_frames = delta * 60
+	var accel = Input.get_accelerometer()
+	var is_accel = accel != Vector3.ZERO
+	
+	steer = clamp(accel.y / 6, -STEER_MAX, STEER_MAX)
+
 #	var simple_accel = (Input.get_accelerometer() * 10).round()/10
 #	var simple_gyro = (Input.get_gyroscope()).round()
 #	$_DEBUG.text = String(simple_accel)
@@ -114,57 +120,26 @@ func _process(delta):
 	if alive:
 		# pressed -> thrust
 		if press and ramp_count > 0:
-			ramp(delta_frames)
+			ramp()
 		elif press and boost_count > 0:
-			boost(delta_frames)
+			boost()
 		elif press:
-			cruise(delta_frames)
+			cruise()
 		else:
-			decay(delta_frames)
-
+			decay()
+		
+		fire.scale.y = thrust / CRUISE_MAX
 		
 		# steer -> direction
 		
 		direction = (Vector2(steer * STEER_MAX, 1)).normalized()
 		
 		# velocity
+		if thrust > 0:
+			velocity = (direction * thrust)
+		velocity.y -= GRAVITY * delta_frames
+		velocity.y = clamp(velocity.y, MAX_FALL, SPEED_MAX)
 		
-		velocity = (direction * thrust)
-		velocity.y -= GRAVITY * delta
-		velocity.y = clamp(velocity.y, MAX_FALL, 1000)
-
-		
-		#set_position(get_position() + Vector2(0, - thrust))
-
-#
-#		var steer_decay = delta if self.position.y != GROUND else delta * 10 #ground friction
-#
-#		if press:
-#
-#			speed = approach(speed, MAX_VELOCITY, POWER * delta)
-#			press_duration += delta * 60
-#
-#			if press_duration < BOOST_DURATION:
-#
-#				y_velocity = min(y_velocity + BOOST_POWER * delta, BOOST_MAX)
-#			else:
-#				y_velocity = min(y_velocity + POWER * delta, MAX_VELOCITY)
-#
-#			if self.position.y == GROUND:
-#				x_velocity = approach_zero(x_velocity, steer_decay)
-#			else:
-#				x_velocity = approach(x_velocity, steer * MAX_STEER, steer * delta * 10)
-#
-#		else:
-#			speed = approach(speed, MAX_FALL, GRAVITY * delta )
-#			#if press_duration !=0: $_DEBUG.text = String(press_duration)
-#			press_duration = 0
-#			y_velocity = max(y_velocity, MAX_FALL)
-#
-#			x_velocity = approach_zero(x_velocity, steer_decay)
-#
-#		#write an approach and an approach_zero method in a tool file
-#
 		steer_tracker += velocity.x
 		var last_frame = sprite.hframes - 1
 		while steer_tracker > steer_flip:
@@ -189,33 +164,31 @@ func _process(delta):
 	if speed > 0: powerMeter.set_frame_color(Color.bisque)
 	else: powerMeter.set_frame_color(Color.darkorchid)
 	
-	$_DEBUG.text = String(Global.simplify(direction))
-	$_DEBUG2.text = String(stepify(steer, .01))
+	$_DEBUG.text = String(is_accel) + ": " + String(thrust)
+	$_DEBUG2.text = String(velocity)
 	
-func ramp(delta_frames):
-	thrust += RAMP_POWER
+func ramp():
+	thrust += RAMP_POWER * delta_frames
 	ramp_count -= delta_frames
 	state = "ramp"
-	fire.scale.y = .3
 
-	
-func boost(delta_frames):
-	thrust += BOOST_POWER
+
+func boost():
+	thrust = approach(thrust, BOOST_MAX, BOOST_POWER * delta_frames)
 	boost_count -= delta_frames
 	state = "boost"
-	fire.scale.y = 1
+
 	
-func cruise(delta_frames):
-	thrust = approach(thrust, CRUISE_MAX, DECAY)
+func cruise():
+	thrust = approach(thrust, CRUISE_MAX, DECAY * delta_frames)
 	state = "cruise"
-	fire.scale.y = 0.6
+
 	
-func decay(delta_frames):
-	thrust = approach_zero(thrust, DECAY)
+func decay():
+	thrust = approach_zero(thrust, DECAY * delta_frames)
 	state = "decay"
 	boost_count = BOOST_DURATION
 	if thrust == 0:
-		fire.scale.y = 0.0
 		ramp_count = RAMP_DURATION
 	
 func _on_Balloon_area_entered(_area):

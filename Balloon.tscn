@@ -22,9 +22,11 @@ script = ExtResource( 2 )
 anims/TurnRight = SubResource( 1 )
 
 [node name="Fire" type="Sprite" parent="."]
-position = Vector2( 0, 42 )
+position = Vector2( 0, 32 )
 scale = Vector2( 0.5, 0.5 )
 texture = ExtResource( 4 )
+centered = false
+offset = Vector2( -24, 0 )
 hframes = 6
 
 [node name="Sprite" type="Sprite" parent="."]
@@ -49,11 +51,10 @@ __meta__ = {
 shape = SubResource( 2 )
 
 [node name="_DEBUG" type="Label" parent="."]
-visible = false
-margin_left = -118.329
-margin_top = 39.2695
-margin_right = 121.671
-margin_bottom = 135.27
+margin_left = -93.5411
+margin_top = -108.176
+margin_right = 146.459
+margin_bottom = -12.1753
 grow_horizontal = 0
 grow_vertical = 0
 size_flags_vertical = 7
@@ -68,11 +69,10 @@ __meta__ = {
 }
 
 [node name="_DEBUG2" type="Label" parent="."]
-visible = false
-margin_left = -139.397
-margin_top = -89.2829
-margin_right = 132.603
-margin_bottom = -41.2825
+margin_left = -148.799
+margin_top = -121.336
+margin_right = 123.201
+margin_bottom = -73.3358
 grow_horizontal = 0
 grow_vertical = 0
 size_flags_vertical = 7
