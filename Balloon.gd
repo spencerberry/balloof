@@ -23,14 +23,14 @@ var steer_tracker = 0 # track how much we've steered for animation purposes
 var steer_flip = 18 # we flip to the next frame when tracker reaches this
 
 var fire_tracker:float = 0.0
-const FIRE_FLIP = 0.5
+const FIRE_FLIP = 0.1
 # Speed
 
-const RAMP_DURATION = 30 # How many frames does ramp last
+const RAMP_DURATION = 60 # How many frames does ramp last
 var ramp_count = RAMP_DURATION # Counter to track these frames
 const RAMP_POWER = .1 # Added to thrust while in ramp
 
-const BOOST_DURATION = 20 # How many frames a boost lasts
+const BOOST_DURATION = 10 # How many frames a boost lasts
 var boost_count = BOOST_DURATION # Counter to track boost frames
 const BOOST_POWER = 1.2 # Added to thrust while in boost, in change per frame
 const BOOST_MAX = 60 
@@ -46,6 +46,8 @@ const SPEED_MAX = 44
 # Direction
 var steer:float  = 0
 const STEER_MAX:float = 8.0
+
+var rudder:float = 0
 var direction:Vector2
 
 #velocity
@@ -111,7 +113,7 @@ func _process(delta):
 	var accel = Input.get_accelerometer()
 	var is_accel = accel != Vector3.ZERO
 	
-	steer = clamp(accel.y / 6, -STEER_MAX, STEER_MAX)
+	steer = clamp((gyro.z - gyro.y) / 20, -STEER_MAX, STEER_MAX)
 
 #	var simple_accel = (Input.get_accelerometer() * 10).round()/10
 #	var simple_gyro = (Input.get_gyroscope()).round()
@@ -131,8 +133,10 @@ func _process(delta):
 		fire.scale.y = thrust / CRUISE_MAX
 		
 		# steer -> direction
+
+		rudder = approach(rudder, steer, max(thrust-CRUISE_MAX, .1))
 		
-		direction = (Vector2(steer * STEER_MAX, 1)).normalized()
+		direction = (Vector2(rudder * STEER_MAX, 1)).normalized()
 		
 		# velocity
 		if thrust > 0:
