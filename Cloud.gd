@@ -39,7 +39,7 @@ func _on_cloud_exited(area):
 func move_within(rectangle: Rect2):
 	var new_position = Vector2(
 			Global.rng.randi_range(rectangle.position.x, rectangle.position.x + rectangle.size.x - shape.extents.x * 2),
-			Global.rng.randi_range(rectangle.position.y, rectangle.position.y + rectangle.size.y - shape.extents.y * 2))
+			Global.rng.randi_range(rectangle.position.y, rectangle.position.y + rectangle.size.y - shape.extents.y * 3))
 	
 	set_position(new_position)
 

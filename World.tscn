@@ -18,7 +18,7 @@ font_data = ExtResource( 3 )
 
 [node name="World" type="Node2D"]
 script = ExtResource( 4 )
-bird_count = 0
+bird_count = 8
 
 [node name="ParallaxBackground" type="ParallaxBackground" parent="."]
 layer = 0

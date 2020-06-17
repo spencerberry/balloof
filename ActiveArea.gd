@@ -15,7 +15,7 @@ func _ready():
 
 func _process(_delta):
 
-	var red_rect = get_top_full()
+	var red_rect = get_top_bumper()
 	$ColorRect.rect_global_position = red_rect.position
 	$ColorRect.rect_size = red_rect.size
 #	$ColorRect.rect_global_position = get_right_bumper().position
